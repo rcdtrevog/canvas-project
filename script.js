@@ -90,3 +90,4 @@ const staticComponents = new StaticComponents()
 const mouseClickActivity = new MouseClickActivity()
 mouseClickActivity.addEventListeners()
 staticComponents.animate()
+///////////////////testing
