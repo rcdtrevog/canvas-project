@@ -41,6 +41,161 @@ class MouseClickActivity {
     document.getElementById("tempBtn").style.display = "block";
   }
 
+  selectingSubArea(activity){
+    // Create a Set to store the processed mesh IDs
+    const processedMeshIds = new Set();
+
+    // Create a raycaster object
+    const raycaster = new THREE.Raycaster();
+
+    // Create a mouse vector to store the mouse position
+    const mouse = new THREE.Vector2();
+
+    // Add an event listener for mouse clicks
+    wallEditor.renderer.domElement.addEventListener(activity, (event) => {
+      // Calculate the mouse position in normalized device coordinates
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+      // Cast a ray from the mouse position
+      raycaster.setFromCamera(mouse, wallEditor.camera);
+
+      // Get the list of intersected objects
+      const intersects = raycaster.intersectObjects(wallEditor.scene.children, true);
+      // console.log(intersects.length)
+      
+
+      // Check if any meshes were intersected
+      if (intersects.length > 0) {
+        for (const intersect of intersects) {
+
+          if(intersect.object.isMesh){
+            const intersectedMesh = intersect.object;
+    
+           // Check if the intersected object has a userData.id property
+            if (intersectedMesh.geometry.userData.id !== undefined) {
+            const meshID = intersectedMesh.geometry.userData.id;
+                // Check if the mesh ID has already been processed
+            if (!processedMeshIds.has(meshID)) {
+              console.log('Mesh clicked:', meshID);
+
+              for (const intersect of intersects) {
+
+          
+                if (intersect.object.isLineSegments) {
+                  if (intersect.object.geometry.userData.id === meshID) {
+                      // Check the current color state of the line
+                      if (!intersect.object.userData.color || intersect.object.userData.color === 'red') {
+                          // Create a new material with blue color
+                          const newMaterial = intersect.object.material.clone();
+                          newMaterial.color.set(0x0000ff);
+                          intersect.object.material = newMaterial;
+                          // Update the color state of the line to blue
+                          intersect.object.userData.color = 'blue';
+                      } else {
+                          // Create a new material with red color
+                          const newMaterial = intersect.object.material.clone();
+                          newMaterial.color.set(0xff0000);
+                          intersect.object.material = newMaterial;
+                          // Update the color state of the line to red
+                          intersect.object.userData.color = 'red';
+                      }
+                  }
+              }
+            }
+
+              
+              // for (const newIntersect of intersects) {
+              //   if(newIntersect.object.isLineSegments){
+              //     // newIntersect.object.material.color.set('blue')
+              //     // console.log(intersectedMesh.material.color.getHex())
+              //     if(intersectedMesh.material.color.getHex() === 0xff0000){
+              //       // newIntersect.object.material.color = newIntersect.object.material.color.getHex() === 0x0000ff ? 0xff0000 : 0x0000ff   //blue
+              //       newIntersect.object.material.color = 0x0000ff
+              //     }
+             
+
+              //   }
+              // }
+
+              // wallEditor.linesArray.forEach((each)=>{
+              //   if(each.subAreaGroupID === '1'){
+              //     let newEach = each
+              //     if(each.subAreaOutlineMesh){
+              //       console.log(newEach)
+
+              //     console.log(newEach.subAreaOutlineMesh.material.color = 0xff0000)
+              //   }}
+              // })
+              // Iterate over each line in wallEditor.linesArray
+
+
+              // wallEditor.linesArray.forEach((each) => {
+              //   // Check if the line has a subAreaGroupID of '1'
+              //   if (each.subAreaGroupID === '2') {
+              //       // Check if the line has a subAreaOutlineMesh
+              //       if (each.subAreaOutlineMesh) {
+              //           // Create a copy of the material to avoid modifying the original material
+              //           const newMaterial = each.subAreaOutlineMesh.material.clone();
+              //           // Set the color of the new material to red (0xff0000)
+              //           newMaterial.color.set(0x0000ff);
+              //           // Assign the new material to the subAreaOutlineMesh
+              //           each.subAreaOutlineMesh.material = newMaterial;
+              //       }
+              //   }
+              // });
+
+              // Iterate over each line in wallEditor.linesArray
+              /////////////////////////////////////////////
+              // wallEditor.linesArray.forEach((each) => {
+              //   // Check if the line has a subAreaGroupID of '1'
+              //   if (each.subAreaGroupID === meshID) {
+              //       // Check if the line has a subAreaOutlineMesh
+              //       if (each.subAreaOutlineMesh) {
+              //           // Check the current color of the line
+              //           if (each.color === 'red') {
+              //               // Create a copy of the material to avoid modifying the original material
+              //               const newMaterial = each.subAreaOutlineMesh.material.clone();
+              //               // Set the color of the new material to blue (0x0000ff)
+              //               newMaterial.color.set(0x0000ff);
+              //               // Assign the new material to the subAreaOutlineMesh
+              //               each.subAreaOutlineMesh.material = newMaterial;
+              //               // Update the color state of the line
+              //               each.color = 'blue';
+              //           } else {
+              //               // Create a copy of the material to avoid modifying the original material
+              //               const newMaterial = each.subAreaOutlineMesh.material.clone();
+              //               // Set the color of the new material back to red (0xff0000)
+              //               newMaterial.color.set(0xff0000);
+              //               // Assign the new material to the subAreaOutlineMesh
+              //               each.subAreaOutlineMesh.material = newMaterial;
+              //               // Update the color state of the line
+              //               each.color = 'red';
+              //           }
+              //       }
+              //   }
+              // });
+              ////////////////////////////////////////////////////////////////////
+
+
+
+              this.toggleDots(meshID)
+
+
+              processedMeshIds.add(meshID); // Add the mesh ID to the processed set
+
+              if (event.ctrlKey) {
+                this.toggleDots(meshID)
+              }         
+
+            }
+          }
+          }
+        }
+      }
+    });
+  }
+
   onMouseDown(event) {
     wallEditor.isMouseDown = true;
     // temporaryLine.clearTemporaryLine()
@@ -51,8 +206,16 @@ class MouseClickActivity {
     } else {
       wallEditor.wallType = "wall";
     }
+
+    // this.selectingSubArea('mousemove')
+    this.selectingSubArea('click')
+
+    
   }
   onMouseMove(event) {
+
+    // this.selectingSubArea('mousemove')
+
     // console.log(event)
     //   const mouse = new THREE.Vector2(
     //     (event.clientX / window.innerWidth) * 2 - 1,
@@ -71,34 +234,43 @@ class MouseClickActivity {
     //         console.log('Intersected object:', object);
     //     });
     // }
+    ///////////////////////////////testing below
 
-    const mouse = new THREE.Vector2(
-      (event.clientX / window.innerWidth) * 2 - 1,
-      -(event.clientY / window.innerHeight) * 2 + 1
-    );
+    // const mouse = new THREE.Vector2(
+    //   (event.clientX / window.innerWidth) * 2 - 1,
+    //   -(event.clientY / window.innerHeight) * 2 + 1
+    // );
 
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(mouse, wallEditor.camera);
+    // const raycaster = new THREE.Raycaster();
+    // raycaster.setFromCamera(mouse, wallEditor.camera);
 
-    const intersects = raycaster.intersectObjects(
-      wallEditor.scene.children,
-      true
-    );
+    // const intersects = raycaster.intersectObjects(
+    //   wallEditor.scene.children,
+    //   true
+    // );
 
-    // If there are intersections, handle them
-    if (intersects.length > 0) {
-      // Log information about the intersected object(s)
-      // Get the closest intersected object
-      const closestIntersection = intersects[0];
+    // // If there are intersections, handle them
+    // if (intersects.length > 0) {
+    //   // Log information about the intersected object(s)
+    //   // Get the closest intersected object
+    //   const closestIntersection = intersects[0];
 
-      intersects.forEach((intersect) => {
-        const object = intersect.object;
-        // console.log('Intersected object:', object);
-      });
-    }
+    //   intersects.forEach((intersect) => {
+    //     const object = intersect.object;
+    //     // console.log('Intersected object:', object);
+    //   });
+    // }
+
+    ////////////////////////////testing above
   }
 
   onMouseUp(event) {
+
+
+
+    ////////////////////////////////////////////////////////
+
+
     // console.log(wallEditor.tempDotsGroup)
     wallEditor.isMouseDown = false;
 
@@ -139,6 +311,18 @@ class MouseClickActivity {
     wallEditor.mousePoints.length = 0;
   }
 
+
+  toggleDots(meshID){
+    console.log(wallEditor.subAreaGroupID);
+    console.log(meshID);
+
+    if (wallEditor.lineDots[meshID]) {
+      wallEditor.lineDots[meshID].forEach((dot) => {
+        dot.visible = !dot.visible;
+      });
+    }
+
+  }
   //Changed addpoints to update
   update(event) {
     const mouse = new THREE.Vector2(
@@ -254,23 +438,62 @@ class MouseClickActivity {
         // console.log(wallEditor.spaceBetweenLines)
       });
 
-    document.getElementById("tempBtn").addEventListener("click", (event) => {
-      console.log("temp clicked");
-      console.log(wallEditor.subAreaGroupID);
+    document.getElementById("tempBtn").addEventListener("click", (event) => {      
 
-      // To toggle visibility for a specific line's dots
+      console.log(wallEditor.linesArray)
+      wallEditor.tempActivator = true
+
+      ////////////////////////////////////////////////
+
+      // console.log(wallEditor.spherePosition[1][0] = {x: -1.4875621890547263, y: 0.592039800995025})
+      // console.log(wallEditor.spherePosition[1])
+
+      // let points = wallEditor.spherePosition[1]
+
+      // const shape = new THREE.Shape();
+
+      // shape.moveTo(points[0].x, points[0].y); // Move to the starting point
+
+      // for (let i = 1; i < points.length; i++) {
+      //   const point = points[i];
+      //   shape.lineTo(point.x, point.y);
+      // }
+
+      // // Close the shape by drawing a line from the last point to the starting point
+      // shape.lineTo(points[0].x, points[0].y);
+
+
+      // const geometry = new THREE.ShapeGeometry(shape);
+      // const material = new THREE.MeshBasicMaterial({
+      //   color: 0xff0000,
+      //   side: THREE.DoubleSide,
+      // });
+      // const mesh = new THREE.Mesh(geometry, material);
+
+      // wallEditor.scene.add(mesh);
+
+////////////////////////////////////////////
+
+      // console.log("temp clicked");
+      // console.log(wallEditor.subAreaGroupID);
+
+      // // To toggle visibility for a specific line's dots
       // const lineId = wallEditor.subAreaGroupID;
-      // const lineId = '1';
-      let lineId = wallEditor.subAreaGroupID;
+      // // const lineId = '1';
+      // let lineId = wallEditor.subAreaGroupID;
 
-      console.log(lineId);
-      // console.log(lineId2)
+      // console.log(lineId);
+      // // console.log(lineId2)
 
-      if (wallEditor.lineDots[lineId]) {
-        wallEditor.lineDots[lineId].forEach((dot) => {
-          dot.visible = !dot.visible;
-        });
-      }
+      // if (wallEditor.lineDots[lineId]) {
+      //   wallEditor.lineDots[lineId].forEach((dot) => {
+      //     dot.visible = !dot.visible;
+      //   });
+      // }
+
+
+
+      // console.log(wallEditor.lineDots)
     });
     document.getElementById("subAreaBtn").addEventListener("click", () => {
       wallEditor.wallType = "subArea";
@@ -280,7 +503,7 @@ class MouseClickActivity {
       wallEditor.firstNewP1 = null;
       wallEditor.lastEndPoint = null;
 
-      console.log(wallEditor.subAreaGroupID);
+      // console.log(wallEditor.subAreaGroupID);
       // if(wallEditor.subAreaGroupID === "1"){
       //   console.log('x')
       // }
@@ -290,7 +513,7 @@ class MouseClickActivity {
 
       wallEditor.subAreaGroupID = `${parseInt(wallEditor.subAreaGroupID) + 1}`;
 
-      console.log(wallEditor.subAreaGroupID);
+      // console.log(wallEditor.subAreaGroupID);
 
       const lineId = wallEditor.subAreaGroupID;
       if (wallEditor.lineDots[lineId]) {
@@ -373,7 +596,7 @@ class MouseClickActivity {
       wallEditor.camera = wallEditor.orthographicCamera;
       wallEditor.controls.object = wallEditor.camera; //this updates the orbit control with the new camera
       wallEditor.controls.enableRotate = false;
-      wallEditor.dotsGroup.visible = true;
+      wallEditor.dotsGroup.visible = false;
       wallEditor.linesArray.forEach((line) => wallDrawer.draw2DWall(line));
       this.toggleBtns2D();
 

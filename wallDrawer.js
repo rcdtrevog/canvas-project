@@ -74,6 +74,9 @@ class WallDrawer extends THREE.Object3D {
       const p3 = new THREE.Vector3()
         .copy(line.end)
         .addScaledVector(perpendicular, -wallWidth / 2);
+
+
+        console.log(wallWidth)
       const p4 = new THREE.Vector3()
         .copy(line.start)
         .addScaledVector(perpendicular, -wallWidth / 2);
@@ -131,12 +134,27 @@ class WallDrawer extends THREE.Object3D {
 
             const geometry = new THREE.ShapeGeometry(shape);
             const material = new THREE.MeshBasicMaterial({
-              color: 0xff0000,
+              color: line.color,
               side: THREE.DoubleSide,
             });
+
+
+            geometry.userData.id = wallEditor.subAreaGroupID;
+
             const mesh = new THREE.Mesh(geometry, material);
 
+            mesh.addEventListener('click', () => {
+              console.log('Mesh clicked:', mesh.geometry.userData.id);
+          });
+
+          mesh.addEventListener('mouseover', () => {
+            console.log('Mesh hovered:', mesh.geometry.userData.id);
+        });
+
             wallEditor.scene.add(mesh);
+
+            console.log(mesh);
+
 
             wallEditor.allVerticesofSubArea = [];
             newP2.copy(wallEditor.firstNewP1);
@@ -144,6 +162,8 @@ class WallDrawer extends THREE.Object3D {
             wallEditor.lastEndPoint = null;
             wallEditor.firstNewP1 = null; // Reset firstNewP1
             wallEditor.subAreafirstLineDrawn = false;
+
+
           }
         } else {
           wallEditor.subAreafirstLineDrawn = true;
@@ -185,6 +205,7 @@ class WallDrawer extends THREE.Object3D {
 
         const outlineMaterial = new THREE.LineBasicMaterial({
           color: line.color,
+          // color:'gold'
         });
         const outlineMesh = new THREE.LineSegments(
           outlineGeometry,
@@ -226,11 +247,17 @@ class WallDrawer extends THREE.Object3D {
         wallEditor.subAreaOutlineMesh = outlineMesh;
         if (wallEditor.isSubAreaCompleted) {
           // wallEditor.subAreaOutlineMesh.geometry.userData.id = `${wallEditor.subAreaOutlineMesh.geometry.userData.id - 1}`
-          console.log(wallEditor.subAreaOutlineMesh.geometry.userData.id);
+          console.log('check --------------------------------------------',wallEditor.subAreaOutlineMesh.geometry.userData.id);
+
+          if (wallEditor.lineDots[wallEditor.subAreaGroupID]) {
+            wallEditor.lineDots[wallEditor.subAreaGroupID].forEach((dot) => {
+              dot.visible = !dot.visible;
+            });
+          }
         }
 
         wallEditor.scene.add(wallEditor.subAreaOutlineMesh);
-        console.log(wallEditor.scene.children);
+        // console.log(wallEditor.scene.children);
 
         // console.log(wallEditor.linesArray[wallEditor.linesArray.length-1])
       } else if (line.wallPattern === "solidFill") {
@@ -247,11 +274,11 @@ class WallDrawer extends THREE.Object3D {
         this.createLinesPattern(p1, p2, p3, p4, line);
       }
     }
-    // console.log(wallEditor.subAreaOutlineMesh)
+    console.log(wallEditor.subAreaOutlineMesh)
     // console.log(wallEditor.linesArray)
     // console.log(wallEditor.scene.children)
 
-    console.log(wallEditor.lineDots);
+    // console.log(wallEditor.lineDots);
   }
 
   draw3DWall(line) {
@@ -308,6 +335,19 @@ class WallDrawer extends THREE.Object3D {
 
   createSolidFill(p1, p2, p3, p4, color) {
     // Define vertices for the wall outline, top, and sides
+
+    if(!wallEditor.firstP1){
+      wallEditor.firstP1 = p1
+    }
+
+    
+    // if(wallEditor.linesArray.length === 3){
+    //   p1 = wallEditor.firstP1
+    //   p3 = wallEditor.firstP1 - 0.125 / 2
+    // }
+    console.log(wallEditor.linesArray.length)
+
+
     const vertices = [
       p1.x,
       p1.y,
@@ -348,6 +388,14 @@ class WallDrawer extends THREE.Object3D {
       0, 4, 1, 4, 5, 1, 1, 5, 2, 5, 6, 2, 2, 6, 3, 6, 7, 3, 3, 7, 0, 7, 4, 0,
     ];
 
+
+
+    // console.log(p1.x += 0.025)
+    // console.log(p1.y += 0.025)
+    
+    // console.log(p4.x += 0.025)
+    // console.log(p2.y += 0.025)
+
     // Create buffer geometry
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
@@ -363,6 +411,7 @@ class WallDrawer extends THREE.Object3D {
     });
 
     // this.createWallOutline(p1, p2, p3, p4, color)
+
 
     if (wallEditor.isMouseDown) {
       this.createTempWallOutline(p1, p2, p3, p4);
@@ -702,7 +751,7 @@ class WallDrawer extends THREE.Object3D {
     });
 
     // wallEditor.dotsGroup.visible = true // Initially hide the dots
-    wallEditor.dotsGroup.visible = false;
+    wallEditor.dotsGroup.visible = true;
 
     console.log(wallEditor.dotsGroup);
 

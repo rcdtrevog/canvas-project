@@ -38,6 +38,7 @@ wallEditor.perspectiveCamera = new THREE.PerspectiveCamera(
 )
 wallEditor.perspectiveCamera.position.z = 3
 
+
 wallEditor.spaceBetweenLines = 1
 wallEditor.mousePoints = []
 wallEditor.isMouseDown = false
@@ -82,8 +83,12 @@ wallEditor.subAreafirstLineDrawn = false
 wallEditor.allVerticesofSubArea = []
 wallEditor.wallType = null
 
-wallEditor.subAreaOutlineMesh = null
+
+wallEditor.firstP1 = null
+
+wallEditor.subAreaOutlineMesh = []
 wallEditor.subAreaDotsGroups = null
+wallEditor.counter = 0
 // wallEditor.subAreaDotsGroups = []
 // wallEditor.tempArr = []
 const staticComponents = new StaticComponents()
