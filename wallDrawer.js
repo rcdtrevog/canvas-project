@@ -11,7 +11,7 @@ class WallDrawer extends THREE.Object3D {
   }
 
   draw2DWall(line) {
-    // console.log(line)
+    console.log('line.start__________',line.start)
     // console.log(wallEditor.linesArray)
     const direction = new THREE.Vector3()
       .copy(line.end)
@@ -65,6 +65,11 @@ class WallDrawer extends THREE.Object3D {
         this.createLinesPattern(p1, p2, p3, p4, line);
       }
     } else if (line.alignment === "Center") {
+
+
+      console.log('this is start',line.start)
+      console.log('this is end',line.end)
+
       const p1 = new THREE.Vector3()
         .copy(line.start)
         .addScaledVector(perpendicular, wallWidth / 2);
@@ -76,7 +81,7 @@ class WallDrawer extends THREE.Object3D {
         .addScaledVector(perpendicular, -wallWidth / 2);
 
 
-        console.log(wallWidth)
+        
       const p4 = new THREE.Vector3()
         .copy(line.start)
         .addScaledVector(perpendicular, -wallWidth / 2);
@@ -163,6 +168,13 @@ class WallDrawer extends THREE.Object3D {
             wallEditor.firstNewP1 = null; // Reset firstNewP1
             wallEditor.subAreafirstLineDrawn = false;
 
+
+            console.log('before points') 
+            console.log(wallEditor.spherePosition[1])
+
+            if(wallEditor.subAreaTempLine){//when it snaps the last temp line was visible so did this
+              wallEditor.scene.remove(wallEditor.subAreaTempLine)
+            }
 
           }
         } else {
@@ -274,7 +286,7 @@ class WallDrawer extends THREE.Object3D {
         this.createLinesPattern(p1, p2, p3, p4, line);
       }
     }
-    console.log(wallEditor.subAreaOutlineMesh)
+    // console.log(wallEditor.subAreaOutlineMesh)
     // console.log(wallEditor.linesArray)
     // console.log(wallEditor.scene.children)
 
@@ -345,7 +357,7 @@ class WallDrawer extends THREE.Object3D {
     //   p1 = wallEditor.firstP1
     //   p3 = wallEditor.firstP1 - 0.125 / 2
     // }
-    console.log(wallEditor.linesArray.length)
+    // console.log(wallEditor.linesArray.length)
 
 
     const vertices = [
@@ -421,6 +433,34 @@ class WallDrawer extends THREE.Object3D {
     } else {
       const wall = new THREE.Mesh(geometry, material);
       wallEditor.scene.add(wall);
+
+
+      
+        ///////////////////////////////////////////////////////////////////////
+    
+        if(wallEditor.linesArray.length > 1){
+          const thresholdDistance = 0.001; 
+      
+          const currentLineStart = wallEditor.linesArray[wallEditor.linesArray.length - 1].start;
+          const previousLineEnd = wallEditor.linesArray[wallEditor.linesArray.length - 2].end;
+      
+      
+          // console.log('________________________________________________',currentLineStart, previousLineEnd)
+          
+          const distance = currentLineStart.distanceTo(previousLineEnd);
+          
+          if (distance < thresholdDistance) {
+            wallEditor.linesArray[wallEditor.linesArray.length - 1].connnected = true
+            wallEditor.linesArray[wallEditor.linesArray.length - 2].connnected = true
+            console.log(wallEditor.linesArray);
+            console.log('The lines are connected.');
+
+          } else {
+              console.log(wallEditor.linesArray);
+              console.log('The lines are not connected.');
+          }
+        }
+          //////////////////////////////////////////////////////////////
     }
 
     // const wall = new THREE.Mesh(geometry, material)
@@ -753,7 +793,7 @@ class WallDrawer extends THREE.Object3D {
     // wallEditor.dotsGroup.visible = true // Initially hide the dots
     wallEditor.dotsGroup.visible = true;
 
-    console.log(wallEditor.dotsGroup);
+    // console.log(wallEditor.dotsGroup);
 
     wallEditor.scene.add(wallEditor.dotsGroup); // Add the dotsGroup to the scene
     wallEditor.scene.add(outlineMesh);

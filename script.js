@@ -5,6 +5,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 window.wallEditor = {}
 
+
+
+wallEditor.selectedEdgePoint = 1
+wallEditor.latestMouseDownPosition = {} 
+
 const scene = new THREE.Scene()
 wallEditor.aspect = window.innerWidth / window.innerHeight
 
@@ -37,8 +42,12 @@ wallEditor.perspectiveCamera = new THREE.PerspectiveCamera(
   1000
 )
 wallEditor.perspectiveCamera.position.z = 3
+wallEditor.tempActivator = false
+wallEditor.activateAddPoints = false
 
+wallEditor.startPointSubArea = null
 
+wallEditor.isWallConnected = false
 wallEditor.spaceBetweenLines = 1
 wallEditor.mousePoints = []
 wallEditor.isMouseDown = false
@@ -95,4 +104,3 @@ const staticComponents = new StaticComponents()
 const mouseClickActivity = new MouseClickActivity()
 mouseClickActivity.addEventListeners()
 staticComponents.animate()
-///////////////////testing

@@ -31,6 +31,7 @@ class StaticComponents {
       wallPatternSpaceBetweenLines: wallEditor.spaceBetweenLines,
       wallPattern: wallEditor.currentWallPattern,
       wallType: wallEditor.wallType,
+      connnected : wallEditor.isWallConnected,
 
       object2D,
       object3D,

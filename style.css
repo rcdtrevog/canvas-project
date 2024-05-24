@@ -67,7 +67,9 @@ canvas {
 
 #alignments,
 #wallPatterns,
-#colors {
+#colors,
+#edgePoint,
+#addPoints {
   position: absolute;
   top: 130px;
   left: 10px;
@@ -76,6 +78,16 @@ canvas {
   color: white;
   border: none;
   display: block;
+}
+#edgePoint{
+  top:410px;
+}
+#addPoints{
+  top:450px;
+  cursor: pointer;
+}
+.eachEdge{
+  width: 25px;
 }
 #alignments label,
 #wallPatterns label,
